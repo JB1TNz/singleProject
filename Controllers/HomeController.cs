@@ -11,7 +11,17 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult Supporter()
+    {
+        return View();
+    }
+
     public IActionResult Privacy()
+    {
+        return View();
+    }
+
+    public IActionResult Login()
     {
         return View();
     }

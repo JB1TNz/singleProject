@@ -2,7 +2,171 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<main class="ebook-home">
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Discover Your Next Favorite E-Book</h1>
+      <p>Thousands of titles. Instant download. Read anytime, anywhere.</p>
+      <button class="btn-primary">Browse Collection</button>
+    </div>
+    <div class="hero-image">
+      <img src="#" alt="E-book illustration">
+    </div>
+  </section>
+
+  <!-- Featured Books -->
+  <section class="featured">
+    <h2>Featured E-Books</h2>
+    <div class="book-grid">
+
+      <div class="book-card">
+        <img src="#" alt="Book cover">
+        <h3>The Digital Mind</h3>
+        <p class="author">by Alex Carter</p>
+        <p class="price">$9.99</p>
+      </div>
+
+      <div class="book-card">
+        <img src="#" alt="Book cover">
+        <h3>Future Code</h3>
+        <p class="author">by Jane Smith</p>
+        <p class="price">$12.99</p>
+      </div>
+
+      <div class="book-card">
+        <img src="#" alt="Book cover">
+        <h3>Startup Secrets</h3>
+        <p class="author">by Mark Lee</p>
+        <p class="price">$8.99</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="categories">
+    <h2>Popular Categories</h2>
+    <div class="category-list">
+      <div class="category">📘 Fiction</div>
+      <div class="category">💻 Technology</div>
+      <div class="category">📈 Business</div>
+      <div class="category">🎓 Education</div>
+      <div class="category">🧠 Self-Development</div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="cta">
+    <h2>Start Reading Today</h2>
+    <p>Join thousands of readers and build your digital library.</p>
+    <button class="btn-secondary">Sign Up Now</button>
+  </section>
+
+</main>
+
+<style>
+    body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f9f9f9;
+}
+
+.ebook-home {
+  padding: 40px;
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 60px;
+}
+
+.hero-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.hero-content p {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 12px 24px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: #2e7d32;
+  color: white;
+}
+
+.btn-secondary {
+  background: #fbc02d;
+  color: #333;
+}
+
+.featured h2,
+.categories h2,
+.cta h2 {
+  margin-bottom: 20px;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+}
+
+.book-card {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.book-card img {
+  max-width: 100%;
+  margin-bottom: 10px;
+}
+
+.author {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.price {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.category {
+  background: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.cta {
+  text-align: center;
+  margin-top: 80px;
+  background: #e8f5e9;
+  padding: 40px;
+  border-radius: 12px;
+}
+
+</style>
+

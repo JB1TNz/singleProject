@@ -1,0 +1,206 @@
+@{
+  ViewData["Title"] = "Login";
+}
+
+<head>
+  <link rel="stylesheet" href="./Login.css" asp-append-version="true" />
+</head>
+
+<section class="auth-hero">
+  <div class="auth-card">
+
+    <!-- LOGIN -->
+    <div id="loginBox">
+      <h1>Welcome Back</h1>
+      <p>Log in to access your e-book library.</p>
+
+      <form class="auth-form" asp-controller="Account" asp-action="Login" method="post">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="Enter your password" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Login</button>
+      </form>
+
+      <p class="switch-text">
+        Don’t have an account?
+        <span onclick="showRegister()">Register</span>
+      </p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerBox" class="hidden">
+      <h1>Create Account</h1>
+      <p>Join and start building your digital library.</p>
+
+      <form class="auth-form" asp-controller="Account" asp-action="Register" method="post">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="Your name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="Your email" required>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="Create password" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Register</button>
+      </form>
+
+      <p class="switch-text">
+        Already have an account?
+        <span onclick="showLogin()">Login</span>
+      </p>
+    </div>
+
+  </div>
+
+  <div class="auth-info">
+    <h2>Discover Your Next Favorite E-Book</h2>
+    <p>Thousands of titles. Instant download. Read anytime.</p>
+  </div>
+</section>
+
+
+
+
+
+
+
+@* Script Section *@
+<script>
+  function showRegister() {
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById('registerBox').classList.remove('hidden');
+  }
+
+  function showLogin() {
+    document.getElementById('registerBox').classList.add('hidden');
+    document.getElementById('loginBox').classList.remove('hidden');
+  }
+</script>
+
+
+
+
+
+
+
+
+
+@* Style Section *@
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f9f9f9;
+}
+
+.auth-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  padding: 40px;
+}
+
+.auth-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.auth-card h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.auth-card p {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.btn-primary {
+  margin-top: 10px;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background: #2e7d32;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #256628;
+}
+
+.switch-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.95rem;
+}
+
+.switch-text span {
+  color: #fbc02d;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Right content */
+.auth-info {
+  max-width: 420px;
+}
+
+.auth-info h2 {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.auth-info p {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+</style>

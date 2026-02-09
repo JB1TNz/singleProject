@@ -61,3 +61,8 @@ button.accept-policy {
   position: absolute;
   right: 10px;
 }
+
+.UserLists{
+  position: absolute;
+  right: 80px;
+}

@@ -26,6 +26,10 @@ a {
 
 .navbar{
   background-color: #29579D;
+  position: sticky;
+  position: fixed;
+  top: 0;
+  width: 100%;
 }
 
 .navbar-nav .nav-link {
@@ -57,12 +61,9 @@ button.accept-policy {
   background-color: #29579D;
 }
 
-.Login {
-  position: absolute;
-  right: 10px;
-}
 
-.UserLists{
-  position: absolute;
-  right: 80px;
+.container{
+  position: relative;
+  margin-top: 3rem;
+  z-index: -1;
 }

@@ -1,7 +1,8 @@
 @{
   ViewData["Title"] = "User Lists";
 }
-@model List<singleProject.ViewModels.LoginViewModel>;
+@using singleProject.Models
+@model IEnumerable<singleProject.Models.User>
 <section>
   @* <p>@Model.Username</p> *@
   <h1>User Management</h1>

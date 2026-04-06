@@ -6,8 +6,9 @@ namespace singleProject.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
+    public IActionResult Index(string username)
     {
+        ViewBag.Username = username;
         return View();
     }
 

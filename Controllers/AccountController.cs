@@ -19,7 +19,7 @@ public class AccountController : Controller
     string pass = data.Password;
     ViewBag.Username = user;
     ViewBag.Password = pass;
-    return RedirectToAction("UserLists", "Account", new { user = data.Username , passw = data.Password});
+    return RedirectToAction("Index", "Home", new { username = data.Username });
   }
 
   public IActionResult UserLists(string user, string passw)

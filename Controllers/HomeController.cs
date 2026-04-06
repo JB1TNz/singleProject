@@ -2,11 +2,24 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using singleProject.Models;
 
+
 namespace singleProject.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index(string username)
+    private readonly Csi402dbContext _db;
+    public HomeController(Csi402dbContext db)
+    {
+        _db = db;
+    }
+
+    public IActionResult Lab08()
+    {   
+        var user = (from u in _db.Users select u ).ToList();
+        return View(user);
+    }
+
+    public IActionResult Index()
     {
         ViewBag.Username = username;
         return View();
@@ -26,6 +39,7 @@ public class HomeController : Controller
     {
         return View();
     }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

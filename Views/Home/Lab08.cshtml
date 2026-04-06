@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Lab08";
+}
+@using singleProject.Models
+@model IEnumerable<singleProject.Models.User>
+
+<div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var User in Model)
+            {
+                <tr>
+                    <td>@User.Username</td>
+                    <td>@User.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

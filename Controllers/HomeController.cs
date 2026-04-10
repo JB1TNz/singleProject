@@ -1,27 +1,27 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using singleProject.Models;
+using singleProject.Models.Db;
 
 
 namespace singleProject.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly Csi402dbContext _db;
-    public HomeController(Csi402dbContext db)
+    private readonly EbookBestContext _db;
+    public HomeController(EbookBestContext db)
     {
         _db = db;
     }
 
     public IActionResult Lab08()
     {   
-        var user = (from u in _db.Users select u ).ToList();
+        var user = (from u in _db.UserData select u ).ToList();
         return View(user);
     }
 
     public IActionResult Index()
     {
-        ViewBag.Username = username;
         return View();
     }
 

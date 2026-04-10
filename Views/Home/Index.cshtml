@@ -1,5 +1,25 @@
-﻿@{
+@using Microsoft.AspNetCore.Http
+@{
   ViewData["Title"] = "Home Page";
+  
+  // เช็ค Role จาก Session เพื่อดูว่าจะใช้ Layout ไหน
+  var role = Context.Session.GetString("Role");
+  if (role == "Admin")
+  {
+      Layout = "_AdminLayout";
+  }
+  else if (role == "Seller")
+  {
+      Layout = "_SellerLayout";
+  }
+  else if (role == "User")
+  {
+      Layout = "_UserLayout";
+  }
+  else
+  {
+      Layout = "_Layout"; // Guest layout
+  }
 }
 @model List<singleProject.ViewModels.LoginViewModel>;
 <main class="ebook-home">
@@ -7,7 +27,7 @@
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
-      <p>Welcome @if(ViewBag.Username != null) { @(" " + ViewBag.Username) }</p>
+      <p>Welcome @if(Context.Session.GetString("Username") != null) { @(" " + Context.Session.GetString("Username")) } else if(ViewBag.Username != null) { @(" " + ViewBag.Username) }</p>
       <h1>Discover Your Next Favorite E-Book</h1>
       <p>Thousands of titles. Instant download. Read anytime, anywhere.</p>
       <button class="btn-primary">Browse Collection</button>

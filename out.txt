@@ -1,0 +1,15 @@
+Changed database context to 'EBookBest'.
+COLUMN_NAME                                                                                                                      DATA_TYPE                                                                                                                       
+-------------------------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------
+ProductID                                                                                                                        int                                                                                                                             
+SellerID                                                                                                                         int                                                                                                                             
+ProductName                                                                                                                      nvarchar                                                                                                                        
+ProductDescription                                                                                                               nvarchar                                                                                                                        
+Price                                                                                                                            decimal                                                                                                                         
+CategoryID                                                                                                                       int                                                                                                                             
+ImageURL                                                                                                                         nvarchar                                                                                                                        
+IsAvailable                                                                                                                      bit                                                                                                                             
+UploadDate                                                                                                                       datetime                                                                                                                        
+UpdateDate                                                                                                                       datetime                                                                                                                        
+
+(10 rows affected)

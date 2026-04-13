@@ -1,0 +1,10 @@
+Changed database context to 'EBookBest'.
+COLUMN_NAME                                                                                                                      DATA_TYPE                                                                                                                       
+-------------------------------------------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------------
+UserId                                                                                                                           nvarchar                                                                                                                        
+UserPassword                                                                                                                     nvarchar                                                                                                                        
+UserName                                                                                                                         nvarchar                                                                                                                        
+Email                                                                                                                            nvarchar                                                                                                                        
+UserRole                                                                                                                         nvarchar                                                                                                                        
+
+(5 rows affected)

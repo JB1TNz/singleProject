@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +17,8 @@ public partial class EbookBestContext : DbContext
 
     public virtual DbSet<UserDatum> UserData { get; set; }
 
+    public virtual DbSet<ProductData> Products { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=EBookBest;Trusted_Connection=True;TrustServerCertificate=True");
@@ -34,6 +36,20 @@ public partial class EbookBestContext : DbContext
             entity.Property(e => e.UserName).HasMaxLength(50);
             entity.Property(e => e.UserPassword).HasMaxLength(30);
             entity.Property(e => e.UserRole).HasMaxLength(20);
+        });
+
+        modelBuilder.Entity<ProductData>(entity =>
+        {
+            entity.HasKey(e => e.ProductId);
+            entity.ToTable("Products");
+
+            entity.Property(e => e.ProductId).ValueGeneratedOnAdd();
+            entity.Property(e => e.ProductName).HasMaxLength(200);
+            entity.Property(e => e.ProductDescription).HasMaxLength(2000);
+            entity.Property(e => e.Price).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.FilePath).HasMaxLength(500);
+            entity.Property(e => e.CoverPicture).HasMaxLength(500);
+            entity.Property(e => e.SellerId).HasMaxLength(10);
         });
 
         OnModelCreatingPartial(modelBuilder);

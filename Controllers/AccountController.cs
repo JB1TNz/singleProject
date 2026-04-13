@@ -42,6 +42,7 @@ public class AccountController : Controller
               {
                   HttpContext.Session.SetString("Role", dbUser.UserRole ?? "User");
                   HttpContext.Session.SetString("Username", dbUser.UserName ?? user);
+                  HttpContext.Session.SetString("UserId", dbUser.UserId);
                   return RedirectToAction("Index", "Home");
               }
           }
@@ -88,16 +89,6 @@ public class AccountController : Controller
 
   public IActionResult UserLists(string user, string passw)
   {
-    // var user = new LoginViewModel();
-    // user.Username = "JohnDoe";
-    // user.Password = "Password123";
-    // var user = new List<LoginViewModel>
-    // {
-    //   new LoginViewModel { Username = "JohnDoe", Password = "Password123" },
-    //   new LoginViewModel { Username = "JaneSmith", Password = "SecurePass456" },
-    //   new LoginViewModel { Username = "AliceJohnson", Password = "MyPassword789" }
-    // };
-    // return View(user);e
     ViewBag.Username = user;
     ViewBag.Password = passw;
     return View();

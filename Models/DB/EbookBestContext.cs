@@ -19,6 +19,8 @@ public partial class EbookBestContext : DbContext
 
     public virtual DbSet<ProductData> Products { get; set; }
 
+    public virtual DbSet<UserLibrary> UserLibraries { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=EBookBest;Trusted_Connection=True;TrustServerCertificate=True");
@@ -50,6 +52,15 @@ public partial class EbookBestContext : DbContext
             entity.Property(e => e.FilePath).HasMaxLength(500);
             entity.Property(e => e.CoverPicture).HasMaxLength(500);
             entity.Property(e => e.SellerId).HasMaxLength(10);
+        });
+
+        modelBuilder.Entity<UserLibrary>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("UserLibrary");
+            entity.Property(e => e.UserId).HasMaxLength(10).IsRequired();
+            entity.Property(e => e.ProductId).IsRequired();
+            entity.Property(e => e.PurchaseDate).HasDefaultValueSql("GETDATE()");
         });
 
         OnModelCreatingPartial(modelBuilder);

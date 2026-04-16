@@ -1,0 +1,125 @@
+@using Microsoft.AspNetCore.Http
+@using singleProject.Models.Db
+@model List<ProductData>
+
+@{
+    ViewData["Title"] = "My Library - BestEBook";
+    
+    var role = Context.Session.GetString("Role");
+    if (role == "Admin")
+    {
+        Layout = "_AdminLayout";
+    }
+    else if (role == "Seller")
+    {
+        Layout = "_SellerLayout";
+    }
+    else if (role == "User")
+    {
+        Layout = "_UserLayout";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
+}
+
+<div class="container py-5">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="fw-bold" style="color: #29579D;">
+            <i class="bi bi-collection-play-fill me-2"></i>คลังหนังสือของฉัน (My Library)
+        </h2>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center py-5" style="background: #f8faff; border: 2px dashed #c0ccdf; border-radius: 16px;">
+            <div style="font-size: 4rem; opacity: 0.5; margin-bottom: 16px;">📚</div>
+            <h4 class="fw-bold text-secondary">คุณยังไม่มีหนังสือในคลัง</h4>
+            <p class="text-muted">ไปเลือกซื้อหรือดาวน์โหลดหนังสือที่คุณสนใจกันเถอะ</p>
+            <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-3 px-4 py-2 rounded-pill shadow-sm" style="background: #29579D; border: none;">
+                ไปที่หน้าหลัก
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            @foreach (var book in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm book-card-hover" style="border-radius: 16px; overflow: hidden;">
+                        
+                        <!-- Book Cover -->
+                        <div class="position-relative" style="aspect-ratio: 3/4; background: #e8f0fe; display: flex; align-items: center; justify-content: center;">
+                            @if (!string.IsNullOrEmpty(book.CoverPicture))
+                            {
+                                <img src="@book.CoverPicture" class="w-100 h-100" style="object-fit: cover;" alt="@book.ProductName" />
+                            }
+                            else
+                            {
+                                <div class="text-center text-primary" style="opacity: 0.7;">
+                                    <h1 class="display-3 mb-0">📖</h1>
+                                    <small class="fw-bold">ไม่มีรูปหน้าปก</small>
+                                </div>
+                            }
+                            
+                            <!-- Download Overlay -->
+                            <div class="download-overlay">
+                                @if(!string.IsNullOrEmpty(book.FilePath))
+                                {
+                                    <a href="@book.FilePath" target="_blank" class="btn btn-light rounded-pill px-4 fw-bold text-primary shadow">
+                                        <i class="bi bi-cloud-download-fill me-2"></i>ดาวน์โหลด
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="bi bi-exclamation-triangle-fill me-1"></i> ไฟล์ไม่พร้อมใช้</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold fs-6 mb-1 text-truncate" title="@book.ProductName">@book.ProductName</h5>
+                            <p class="card-text small text-muted text-truncate" title="พร้อมอ่าน">✔️ พร้อมอ่านทันที</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .book-card-hover {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .book-card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(41, 87, 157, 0.15) !important;
+    }
+
+    .download-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(41, 87, 157, 0.6);
+        backdrop-filter: blur(2px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .book-card-hover:hover .download-overlay {
+        opacity: 1;
+    }
+</style>

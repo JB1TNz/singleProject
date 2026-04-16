@@ -1,0 +1,115 @@
+@{
+    ViewData["Title"] = "แก้ไขจัดหนังสือ - Seller";
+    Layout = "_SellerLayout";
+}
+@using singleProject.Models.Db
+@model IEnumerable<ProductData>
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="fw-bold" style="color: #29579D;">
+            <i class="bi bi-pencil-square me-2"></i>จัดการหนังสือ / แก้ไขข้อมูล
+        </h2>
+        <a asp-action="UploadProduct" class="btn btn-primary px-4 py-2" style="background: #29579D; border: none; border-radius: 12px;">
+            <i class="bi bi-plus-circle me-1"></i> อัพโหลดใหม่
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert" style="border-radius: 12px;">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light text-muted">
+                        <tr>
+                            <th class="ps-4">หนังสือ</th>
+                            <th>ประเภท</th>
+                            <th>ราคา</th>
+                            <th>สถานะ</th>
+                            <th class="text-end pe-4">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+                                    ยังไม่มีหนังสือในระบบ
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            var categoryNames = new Dictionary<int, string>
+                            {
+                                { 1, "นิยาย / เรื่องสั้น" },
+                                { 2, "วิชาการ / การศึกษา" },
+                                { 3, "ธุรกิจ / การเงิน" },
+                                { 4, "สุขภาพ / ไลฟ์สไตล์" },
+                                { 5, "เทคโนโลยี / IT" },
+                                { 6, "อื่นๆ" }
+                            };
+
+                            foreach (var book in Model)
+                            {
+                                string catName = book.CategoryId.HasValue && categoryNames.ContainsKey(book.CategoryId.Value) 
+                                    ? categoryNames[book.CategoryId.Value] : "อื่นๆ";
+
+                                <tr>
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            @if (!string.IsNullOrEmpty(book.CoverPicture))
+                                            {
+                                                <img src="@book.CoverPicture" style="width: 50px; height: 70px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light text-center rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 70px; border: 1px dashed #ccc;">
+                                                    <i class="bi bi-book text-muted"></i>
+                                                </div>
+                                            }
+                                            <div>
+                                                <h6 class="mb-1 fw-bold text-dark text-truncate" style="max-width: 250px;" title="@book.ProductName">@book.ProductName</h6>
+                                                <small class="text-muted"><i class="bi bi-clock"></i> เพิ่มเมื่อ @book.CreatedDate?.ToString("dd MMM yyyy")</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border px-2 py-1">@catName</span>
+                                    </td>
+                                    <td class="fw-semibold text-success">
+                                        ฿@book.Price?.ToString("N2")
+                                    </td>
+                                    <td>
+                                        @if (book.Status == 1)
+                                        {
+                                            <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill"><i class="bi bi-eye-fill me-1"></i>เผยแพร่</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill"><i class="bi bi-eye-slash-fill me-1"></i>ซ่อน</span>
+                                        }
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <!-- Action Links -->
+                                        <a asp-action="EditProductDetail" asp-route-id="@book.ProductId" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-1">
+                                            <i class="bi bi-pencil-fill me-1"></i> แก้ไข
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

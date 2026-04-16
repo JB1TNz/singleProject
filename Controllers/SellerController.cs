@@ -19,6 +19,100 @@ public class SellerController : Controller
         _env = env;
     }
 
+    public IActionResult Dashboard()
+    {
+        var sellerId = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(sellerId)) return RedirectToAction("Login", "Account");
+
+        var products = _db.Products.Where(p => p.SellerId == sellerId).ToList();
+        
+        // Count downloads/purchases per product
+        var productStats = products.Select(p => new 
+        {
+            Product = p,
+            DownloadCount = _db.UserLibraries.Count(l => l.ProductId == p.ProductId)
+        }).ToList();
+        
+        ViewBag.TotalProducts = products.Count;
+        ViewBag.TotalDownloads = productStats.Sum(ps => ps.DownloadCount);
+
+        // Map to dynamic list for view
+        return View(productStats);
+    }
+
+    public IActionResult EditProduct()
+    {
+        var sellerId = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(sellerId)) return RedirectToAction("Login", "Account");
+
+        var products = _db.Products.Where(p => p.SellerId == sellerId).OrderByDescending(p => p.CreatedDate).ToList();
+        return View(products);
+    }
+
+    // GET: /Seller/EditProductDetail/5
+    public IActionResult EditProductDetail(int id)
+    {
+        var sellerId = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(sellerId)) return RedirectToAction("Login", "Account");
+
+        var product = _db.Products.FirstOrDefault(p => p.ProductId == id && p.SellerId == sellerId);
+        if (product == null) return NotFound();
+
+        var model = new EditProductViewModel
+        {
+            ProductId = product.ProductId,
+            ProductName = product.ProductName ?? string.Empty,
+            ProductDescription = product.ProductDescription,
+            Price = product.Price ?? 0,
+            CategoryId = product.CategoryId ?? 0,
+            Status = product.Status ?? 1,
+            ExistingCoverPicture = product.CoverPicture
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProductDetail(EditProductViewModel model)
+    {
+        var sellerId = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(sellerId)) return RedirectToAction("Login", "Account");
+
+        if (!ModelState.IsValid)
+            return View(model);
+
+        var product = _db.Products.FirstOrDefault(p => p.ProductId == model.ProductId && p.SellerId == sellerId);
+        if (product == null) return NotFound();
+
+        // Update properties
+        product.ProductName = model.ProductName;
+        product.ProductDescription = model.ProductDescription;
+        product.Price = model.Price;
+        product.CategoryId = model.CategoryId;
+        product.Status = model.Status;
+        product.UpdatedDate = DateTime.Now;
+
+        // If new cover image is uploaded
+        if (model.CoverImage != null && model.CoverImage.Length > 0)
+        {
+            string coversFolder = Path.Combine(_env.WebRootPath, "uploads", "covers");
+            Directory.CreateDirectory(coversFolder);
+
+            string coverFileName = $"{Guid.NewGuid()}_{Path.GetFileName(model.CoverImage.FileName)}";
+            string coverFilePath = Path.Combine(coversFolder, coverFileName);
+            using (var stream = new FileStream(coverFilePath, FileMode.Create))
+            {
+                await model.CoverImage.CopyToAsync(stream);
+            }
+            product.CoverPicture = $"/uploads/covers/{coverFileName}";
+        }
+
+        await _db.SaveChangesAsync();
+        TempData["SuccessMessage"] = $"แก้ไขข้อมูลสินค้า \"{product.ProductName}\" สำเร็จ!";
+        return RedirectToAction("EditProduct");
+    }
+
     // GET: /Seller/UploadProduct 
     public IActionResult UploadProduct()
     {

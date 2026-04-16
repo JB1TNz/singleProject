@@ -1,193 +1,494 @@
 @using Microsoft.AspNetCore.Http
+@using singleProject.Models.Db
+@model List<ProductData>
+
 @{
-  ViewData["Title"] = "Home Page";
-  
-  // เช็ค Role จาก Session เพื่อดูว่าจะใช้ Layout ไหน
-  var role = Context.Session.GetString("Role");
-  if (role == "Admin")
-  {
-      Layout = "_AdminLayout";
-  }
-  else if (role == "Seller")
-  {
-      Layout = "_SellerLayout";
-  }
-  else if (role == "User")
-  {
-      Layout = "_UserLayout";
-  }
-  else
-  {
-      Layout = "_Layout"; // Guest layout
-  }
+    ViewData["Title"] = "Home - BestEBook";
+
+    var role = Context.Session.GetString("Role");
+    if (role == "Admin")
+    {
+        Layout = "_AdminLayout";
+    }
+    else if (role == "Seller")
+    {
+        Layout = "_SellerLayout";
+    }
+    else if (role == "User")
+    {
+        Layout = "_UserLayout";
+    }
+    else
+    {
+        Layout = "_Layout"; // Guest layout
+    }
+
+    var categoryNames = new Dictionary<int, string>
+    {
+        { 1, "📖 นิยาย / เรื่องสั้น" },
+        { 2, "🎓 วิชาการ / การศึกษา" },
+        { 3, "💼 ธุรกิจ / การเงิน" },
+        { 4, "🌿 สุขภาพ / ไลฟ์สไตล์" },
+        { 5, "💻 เทคโนโลยี / IT" },
+        { 6, "📦 อื่นๆ" }
+    };
 }
-@model List<singleProject.ViewModels.LoginViewModel>;
+
 <main class="ebook-home">
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <p>Welcome @if(Context.Session.GetString("Username") != null) { @(" " + Context.Session.GetString("Username")) } else if(ViewBag.Username != null) { @(" " + ViewBag.Username) }</p>
-      <h1>Discover Your Next Favorite E-Book</h1>
-      <p>Thousands of titles. Instant download. Read anytime, anywhere.</p>
-      <button class="btn-primary">Browse Collection</button>
-    </div>
-    <div class="hero-image">
-      <img src="#" alt="E-book illustration">
-    </div>
-  </section>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <p class="hero-welcome">
+                Welcome
+                @if (Context.Session.GetString("Username") != null)
+                {
+                    <strong>@Context.Session.GetString("Username")</strong>
+                }
+                else if (ViewBag.Username != null)
+                {
+                    <strong>@ViewBag.Username</strong>
+                }
+                else
+                {
+                    <span>Guest</span>
+                }
+            </p>
+            <h1 class="hero-title">Discover Your Next<br />Favorite E-Book ✨</h1>
+            <p class="hero-sub">Thousands of titles. Instant download. Read anytime, anywhere.</p>
+            <a href="#featured-section" class="btn-hero">
+                <i class="bi bi-search me-2"></i>Browse Collection
+            </a>
+        </div>
+        <div class="hero-illustration">
+            <div class="hero-book-stack">
+                <div class="hero-book b1">📘</div>
+                <div class="hero-book b2">📗</div>
+                <div class="hero-book b3">📕</div>
+            </div>
+        </div>
+    </section>
 
-  <!-- Featured Books -->
-  <section class="featured">
-    <h2>Featured E-Books</h2>
-    <div class="book-grid">
+    <!-- Featured Books from DB -->
+    <section class="featured-section" id="featured-section">
+        <div class="section-header">
+            <h2 class="section-title"><i class="bi bi-stars me-2 text-warning"></i>หนังสือแนะนำ</h2>
+            <p class="section-sub">อัพเดตล่าสุดจากคลังหนังสือของเรา</p>
+        </div>
 
-      <div class="book-card">
-        <img src="~/Content/image/TheDigitalMind.png" alt="Book cover">
-        <h3>The Digital Mind</h3>
-        <p class="author">by Alex Carter</p>
-        <p class="price">$9.99</p>
-      </div>
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📚</div>
+                <h3>ยังไม่มีหนังสือในระบบ</h3>
+                <p class="text-muted">เร็วๆ นี้จะมีหนังสือมาให้เลือกอ่าน</p>
+            </div>
+        }
+        else
+        {
+            <div class="book-grid">
+                @foreach (var book in Model)
+                {
+                    <a href="@Url.Action("BookPreview", "Home", new { id = book.ProductId })" class="book-card-link">
+                        <div class="book-card">
+                            <!-- Cover Image -->
+                            <div class="book-cover">
+                                @if (!string.IsNullOrEmpty(book.CoverPicture))
+                                {
+                                    <img src="@book.CoverPicture" alt="@book.ProductName" class="book-cover-img" />
+                                }
+                                else
+                                {
+                                    <div class="book-no-cover">
+                                        <span class="no-cover-icon">📖</span>
+                                        <span class="no-cover-text">ไม่พบปกหนังสือ</span>
+                                    </div>
+                                }
+                            </div>
+                            <!-- Book Info -->
+                            <div class="book-info">
+                                <div class="book-category">
+                                    @(book.CategoryId.HasValue && categoryNames.ContainsKey(book.CategoryId.Value)
+                                        ? categoryNames[book.CategoryId.Value]
+                                        : "📦 อื่นๆ")
+                                </div>
+                                <h3 class="book-title">@book.ProductName</h3>
+                                <p class="book-desc">@(book.ProductDescription?.Length > 80 ? book.ProductDescription[..80] + "..." : book.ProductDescription ?? "-")</p>
+                                <div class="book-footer">
+                                    <span class="book-price">฿@book.Price?.ToString("N2")</span>
+                                    <span class="btn-view-detail">ดูรายละเอียด <i class="bi bi-arrow-right-short"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+    </section>
 
-      <div class="book-card">
-        <img src="#" alt="Book cover">
-        <h3>Future Code</h3>
-        <p class="author">by Jane Smith</p>
-        <p class="price">$12.99</p>
-      </div>
+    <!-- Categories Section -->
+    <section class="categories-section">
+        <h2 class="section-title"><i class="bi bi-grid-fill me-2 text-primary"></i>หมวดหมู่ยอดนิยม</h2>
+        <div class="category-list">
+            <div class="category-chip">📖 นิยาย</div>
+            <div class="category-chip">💻 เทคโนโลยี</div>
+            <div class="category-chip">💼 ธุรกิจ</div>
+            <div class="category-chip">🎓 การศึกษา</div>
+            <div class="category-chip">🌿 ไลฟ์สไตล์</div>
+        </div>
+    </section>
 
-      <div class="book-card">
-        <img src="#" alt="Book cover">
-        <h3>Startup Secrets</h3>
-        <p class="author">by Mark Lee</p>
-        <p class="price">$8.99</p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- Categories -->
-  <section class="categories">
-    <h2>Popular Categories</h2>
-    <div class="category-list">
-      <div class="category">📘 Fiction</div>
-      <div class="category">💻 Technology</div>
-      <div class="category">📈 Business</div>
-      <div class="category">🎓 Education</div>
-      <div class="category">🧠 Self-Development</div>
-    </div>
-  </section>
-
-  <!-- Call to Action -->
-  <section class="cta">
-    <h2>Start Reading Today</h2>
-    <p>Join thousands of readers and build your digital library.</p>
-    <button class="btn-secondary">Sign Up Now</button>
-  </section>
+    <!-- CTA Section -->
+    @if (Context.Session.GetString("UserId") == null)
+    {
+        <section class="cta-section">
+            <h2>🚀 เริ่มต้นอ่านวันนี้</h2>
+            <p>เข้าร่วมชุมชนนักอ่านและสร้างคลังหนังสือดิจิทัลของคุณ</p>
+            <a class="btn-cta" asp-controller="Account" asp-action="Login">
+                <i class="bi bi-person-plus-fill me-2"></i>สมัครสมาชิกฟรี
+            </a>
+        </section>
+    }
 
 </main>
 
 <style>
-    body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: #f9f9f9;
-}
+    @@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Inter:wght@400;600;700&display=swap');
 
-.ebook-home {
-  padding: 40px;
-}
+    .ebook-home {
+        font-family: 'Sarabun', 'Inter', sans-serif;
+        padding: 0 0 60px 0;
+    }
 
-.hero {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 40px;
-  margin-bottom: 60px;
-}
+    /* ── Hero ── */
+    .hero-section {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+        padding: 60px 32px 60px;
+        background: linear-gradient(135deg, #29579D 0%, #1a3a6e 60%, #0d1f40 100%);
+        border-radius: 0 0 32px 32px;
+        color: #fff;
+        margin-bottom: 56px;
+        position: relative;
+        overflow: hidden;
+    }
 
-.hero-content h1 {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-}
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at top right, rgba(255,255,255,0.07) 0%, transparent 60%);
+        pointer-events: none;
+    }
 
-.hero-content p {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-}
+    .hero-content { max-width: 560px; z-index: 1; }
 
-.btn-primary,
-.btn-secondary {
-  padding: 12px 24px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-}
+    .hero-welcome {
+        font-size: 1rem;
+        opacity: 0.8;
+        margin-bottom: 12px;
+    }
 
-.btn-primary {
-  background: #2e7d32;
-  color: white;
-}
+    .hero-title {
+        font-size: 2.6rem;
+        font-weight: 700;
+        line-height: 1.25;
+        margin-bottom: 14px;
+    }
 
-.btn-secondary {
-  background: #fbc02d;
-  color: #333;
-}
+    .hero-sub {
+        font-size: 1.05rem;
+        opacity: 0.75;
+        margin-bottom: 28px;
+    }
 
-.featured h2,
-.categories h2,
-.cta h2 {
-  margin-bottom: 20px;
-}
+    .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        padding: 12px 28px;
+        background: #fff;
+        color: #29579D;
+        font-weight: 700;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 0.97rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
 
-.book-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 24px;
-}
+    .btn-hero:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        color: #1a3a6e;
+    }
 
-.book-card {
-  background: white;
-  padding: 16px;
-  border-radius: 8px;
-  text-align: center;
-}
+    /* Hero Illustration */
+    .hero-illustration {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1;
+    }
 
-.book-card img {
-  max-width: 100%;
-  margin-bottom: 10px;
-}
+    .hero-book-stack {
+        display: flex;
+        align-items: flex-end;
+        gap: -8px;
+        position: relative;
+    }
 
-.author {
-  font-size: 0.9rem;
-  color: #666;
-}
+    .hero-book {
+        font-size: 5rem;
+        filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+        animation: float 3s ease-in-out infinite;
+    }
 
-.price {
-  font-weight: bold;
-  margin-top: 5px;
-}
+    .hero-book.b1 { animation-delay: 0s; transform: rotate(-10deg); }
+    .hero-book.b2 { animation-delay: 0.4s; font-size: 6rem; }
+    .hero-book.b3 { animation-delay: 0.8s; transform: rotate(10deg); }
 
-.category-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
+    @@keyframes float {
+        0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+        50% { transform: translateY(-12px) rotate(var(--rot, 0deg)); }
+    }
 
-.category {
-  background: white;
-  padding: 12px 20px;
-  border-radius: 20px;
-  cursor: pointer;
-}
+    /* ── Section Common ── */
+    .featured-section,
+    .categories-section {
+        padding: 0 32px;
+        margin-bottom: 48px;
+    }
 
-.cta {
-  text-align: center;
-  margin-top: 80px;
-  background: #e8f5e9;
-  padding: 40px;
-  border-radius: 12px;
-}
+    .section-header { margin-bottom: 28px; }
 
+    .section-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 4px;
+    }
+
+    .section-sub { color: #6b7280; font-size: 0.95rem; }
+
+    /* ── Book Grid ── */
+    .book-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+        gap: 24px;
+    }
+
+    .book-card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .book-card {
+        background: #fff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        transition: transform 0.22s, box-shadow 0.22s;
+        border: 1px solid rgba(0,0,0,0.06);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 32px rgba(41,87,157,0.18);
+    }
+
+    .book-cover {
+        width: 100%;
+        height: 200px;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .book-cover-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .book-no-cover {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #e8f0fe, #c7d7f8);
+    }
+
+    .no-cover-icon { font-size: 2.8rem; }
+
+    .no-cover-text {
+        font-size: 0.8rem;
+        color: #29579D;
+        font-weight: 600;
+        text-align: center;
+        padding: 0 8px;
+    }
+
+    .book-info {
+        padding: 16px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-category {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #29579D;
+        background: #eef3fc;
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 50px;
+        margin-bottom: 8px;
+    }
+
+    .book-title {
+        font-size: 0.97rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 6px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .book-desc {
+        font-size: 0.8rem;
+        color: #6b7280;
+        flex: 1;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .book-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-top: 1px solid #f1f5f9;
+        padding-top: 10px;
+    }
+
+    .book-price {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #16a34a;
+    }
+
+    .btn-view-detail {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #29579D;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+        text-align: center;
+        padding: 64px 20px;
+        background: #f8faff;
+        border-radius: 16px;
+        border: 2px dashed #c0ccdf;
+    }
+
+    .empty-icon { font-size: 4rem; margin-bottom: 16px; }
+
+    /* ── Categories ── */
+    .category-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .category-chip {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #374151;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .category-chip:hover {
+        background: #29579D;
+        color: #fff;
+        border-color: #29579D;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 14px rgba(41,87,157,0.25);
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+        margin: 0 32px;
+        text-align: center;
+        background: linear-gradient(135deg, #29579D, #1a3a6e);
+        padding: 52px 40px;
+        border-radius: 24px;
+        color: #fff;
+        box-shadow: 0 8px 32px rgba(41,87,157,0.28);
+    }
+
+    .cta-section h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .cta-section p {
+        opacity: 0.8;
+        margin-bottom: 28px;
+        font-size: 1rem;
+    }
+
+    .btn-cta {
+        display: inline-flex;
+        align-items: center;
+        padding: 13px 32px;
+        background: #fff;
+        color: #29579D;
+        font-weight: 700;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 1rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    }
+
+    .btn-cta:hover {
+        transform: translateY(-2px) scale(1.03);
+        color: #1a3a6e;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+    }
+
+    @@media (max-width: 768px) {
+        .hero-section { flex-direction: column; padding: 40px 20px; text-align: center; }
+        .hero-title { font-size: 1.9rem; }
+        .hero-illustration { display: none; }
+        .featured-section, .categories-section, .cta-section { padding: 0 16px; margin: 0 0 36px 0; }
+        .cta-section { margin: 0; }
+        .book-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+    }
 </style>
-

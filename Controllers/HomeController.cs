@@ -22,7 +22,82 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var products = _db.Products
+            .Where(p => p.Status == 1)
+            .OrderByDescending(p => p.CreatedDate)
+            .ToList();
+        return View(products);
+    }
+
+    public IActionResult BookPreview(int id)
+    {
+        var product = _db.Products.FirstOrDefault(p => p.ProductId == id);
+        if (product == null)
+            return NotFound();
+            
+        // Check if user already owns it
+        var userId = HttpContext.Session.GetString("UserId");
+        if (!string.IsNullOrEmpty(userId))
+        {
+            ViewBag.AlreadyOwned = _db.UserLibraries.Any(l => l.UserId == userId && l.ProductId == id);
+        }
+        else
+        {
+            ViewBag.AlreadyOwned = false;
+        }
+            
+        return View(product);
+    }
+
+    [HttpPost]
+    public IActionResult BuyBook(int id)
+    {
+        var userId = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userId))
+            return RedirectToAction("Login", "Account");
+
+        var product = _db.Products.FirstOrDefault(p => p.ProductId == id);
+        if (product == null) return NotFound();
+
+        // Check if already bought
+        var alreadyOwned = _db.UserLibraries.Any(l => l.UserId == userId && l.ProductId == id);
+        if (!alreadyOwned)
+        {
+            _db.UserLibraries.Add(new UserLibrary 
+            { 
+                UserId = userId, 
+                ProductId = id, 
+                PurchaseDate = DateTime.Now 
+            });
+            _db.SaveChanges();
+            TempData["SuccessMessage"] = "สั่งซื้อหนังสือเรียบร้อยแล้ว!";
+        }
+
+        return RedirectToAction("MyLibrary");
+    }
+
+    public IActionResult MyLibrary()
+    {
+        var userId = HttpContext.Session.GetString("UserId");
+        if (string.IsNullOrEmpty(userId))
+            return RedirectToAction("Login", "Account");
+
+        // Join UserLibrary and Products
+        var library = (from lib in _db.UserLibraries
+                       join p in _db.Products on lib.ProductId equals p.ProductId
+                       where lib.UserId == userId
+                       orderby lib.PurchaseDate descending
+                       select new 
+                       {
+                           Product = p,
+                           PurchaseDate = lib.PurchaseDate
+                       }).ToList();
+
+        // Pass to view (using Dynamic or ViewModel, here we can just use dynamic or pass Products)
+        // Since View takes strongly typed mode, we'll pass the list of products directly and store dates in ViewBag if needed.
+        // For simplicity, passing List<ProductData>
+        var products = library.Select(x => x.Product).ToList();
+        return View(products);
     }
 
     public IActionResult Supporter()

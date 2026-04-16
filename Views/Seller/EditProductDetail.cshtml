@@ -1,8 +1,7 @@
-@using Microsoft.AspNetCore.Http
-@model singleProject.ViewModels.ProductViewModel
+@model singleProject.ViewModels.EditProductViewModel
 
 @{
-    ViewData["Title"] = "อัพโหลดสินค้า";
+    ViewData["Title"] = "แก้ไขสินค้า";
     Layout = "_SellerLayout";
 }
 
@@ -10,35 +9,29 @@
     <div class="col-lg-8 col-md-10">
 
         <!-- Header Card -->
-        <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #29579D, #1a3a6e); border-radius: 16px;">
+        <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #1a3a6e, #29579D); border-radius: 16px;">
             <div class="card-body text-white text-center py-4">
-                <div class="fs-1 mb-2">📦</div>
-                <h1 class="h3 fw-bold mb-1">อัพโหลดสินค้าใหม่</h1>
-                <p class="mb-0 opacity-75">กรอกข้อมูลสินค้าให้ครบถ้วนแล้วกดอัพโหลด</p>
+                <div class="fs-1 mb-2">✏️</div>
+                <h1 class="h3 fw-bold mb-1">แก้ไขข้อมูลสินค้า</h1>
+                <p class="mb-0 opacity-75">อัปเดตรายละเอียดหนังสือ ราคา หมวดหมู่ และสถานะ</p>
             </div>
         </div>
-
-        @if (TempData["SuccessMessage"] != null)
-        {
-            <div class="alert alert-success d-flex align-items-center gap-2 shadow-sm" role="alert" style="border-radius: 12px;">
-                <i class="bi bi-check-circle-fill fs-5"></i>
-                <span>@TempData["SuccessMessage"]</span>
-            </div>
-        }
 
         @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
         {
             <div class="alert alert-danger d-flex align-items-center gap-2 shadow-sm" role="alert" style="border-radius: 12px;">
                 <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-                <span>กรุณาตรวจสอบข้อมูลให้ครบถ้วน</span>
+                <span>กรุณาตรวจสอบข้อมูลให้ถูกต้องครบถ้วน</span>
             </div>
         }
 
         <!-- Form Card -->
         <div class="card border-0 shadow-sm" style="border-radius: 16px;">
             <div class="card-body p-4">
-                <form asp-action="UploadProduct" method="post" enctype="multipart/form-data">
+                <form asp-action="EditProductDetail" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="ProductId" />
+                    <input type="hidden" asp-for="ExistingCoverPicture" />
 
                     <!-- ชื่อสินค้า -->
                     <div class="mb-3">
@@ -99,47 +92,38 @@
                         </select>
                     </div>
 
-                    <!-- ไฟล์สินค้า + ภาพปก -->
-                    <div class="row g-3 mb-4">
-                        <!-- ไฟล์สินค้า -->
-                        <div class="col-md-6">
-                            <label asp-for="File" class="form-label fw-semibold">
-                                <i class="bi bi-file-earmark-arrow-up-fill text-primary me-1"></i> ไฟล์สินค้า (PDF/ZIP...) <span class="text-danger">*</span>
-                            </label>
-                            <div class="upload-drop-zone" id="fileDropZone" onclick="document.getElementById('FileInput').click()">
-                                <i class="bi bi-cloud-arrow-up fs-2 text-primary"></i>
-                                <div class="mt-1 fw-semibold" id="fileDropText">คลิกหรือลากไฟล์มาวางที่นี่</div>
-                                <small class="text-muted">รองรับ PDF, ZIP, EPUB และอื่นๆ</small>
+                    <!-- ไฟล์สินค้า (ไม่อนุญาตให้แก้ไข) -->
+                    <div class="mb-3">
+                        <div class="alert alert-secondary d-flex align-items-center gap-2 mb-0" role="alert" style="border-radius: 10px;">
+                            <i class="bi bi-file-earmark-lock-fill fs-5"></i>
+                            <div>
+                                <strong>ไฟล์หนังสือ:</strong> ไม่สามารถแก้ไขไฟล์หนังสือได้ (<a asp-action="EditProduct" class="text-decoration-none">ต้องการอัปโหลดใหม่? สร้างเล่มใหม่แทน</a>)
                             </div>
-                            <input asp-for="File" type="file" id="FileInput" class="d-none"
-                                   onchange="updateFileLabel(this, 'fileDropText')" />
-                            <span asp-validation-for="File" class="text-danger small"></span>
-                        </div>
-
-                        <!-- ภาพหน้าปก -->
-                        <div class="col-md-6">
-                            <label asp-for="CoverImage" class="form-label fw-semibold">
-                                <i class="bi bi-image-fill text-primary me-1"></i> ภาพหน้าปก (JPG/PNG)
-                            </label>
-                            <div class="upload-drop-zone cover-drop" id="coverDropZone" onclick="document.getElementById('CoverImageInput').click()">
-                                <img id="coverPreview" src="" alt="" class="d-none" style="max-height: 120px; border-radius: 8px; object-fit: cover;" />
-                                <div id="coverPlaceholder">
-                                    <i class="bi bi-image fs-2 text-primary"></i>
-                                    <div class="mt-1 fw-semibold">คลิกเพื่อเลือกภาพปก</div>
-                                    <small class="text-muted">JPG, PNG, WEBP</small>
-                                </div>
-                            </div>
-                            <input asp-for="CoverImage" type="file" id="CoverImageInput" accept="image/*"
-                                   class="d-none" onchange="previewCover(this)" />
                         </div>
                     </div>
 
+                    <!-- ภาพหน้าปก -->
+                    <div class="mb-4">
+                        <label asp-for="CoverImage" class="form-label fw-semibold">
+                            <i class="bi bi-image-fill text-primary me-1"></i> ภาพหน้าปก (อัปโหลดใหม่เพื่อเปลี่ยน)
+                        </label>
+                        <div class="upload-drop-zone cover-drop" id="coverDropZone" onclick="document.getElementById('CoverImageInput').click()">
+                            <img id="coverPreview" src="@(!string.IsNullOrEmpty(Model.ExistingCoverPicture) ? Model.ExistingCoverPicture : "")" alt="Cover Preview" class="@(string.IsNullOrEmpty(Model.ExistingCoverPicture) ? "d-none" : "")" style="max-height: 120px; border-radius: 8px; object-fit: cover;" />
+                            <div id="coverPlaceholder" style="@(!string.IsNullOrEmpty(Model.ExistingCoverPicture) ? "display: none;" : "")">
+                                <i class="bi bi-image fs-2 text-primary"></i>
+                                <div class="mt-1 fw-semibold">คลิกเพื่อเปลี่ยนภาพปก</div>
+                                <small class="text-muted">JPG, PNG, WEBP (หากไม่เลือก ค่าเดิมจะถูกเก็บไว้)</small>
+                            </div>
+                        </div>
+                        <input asp-for="CoverImage" type="file" id="CoverImageInput" accept="image/*" class="d-none" onchange="previewCover(this)" />
+                    </div>
+
                     <!-- Action Buttons -->
-                    <div class="d-flex gap-3 align-items-center pt-2 border-top">
-                        <button type="submit" class="btn btn-primary btn-lg px-4 shadow-sm" style="background: linear-gradient(135deg, #29579D, #1a3a6e); border: none; border-radius: 10px;">
-                            <i class="bi bi-cloud-arrow-up-fill me-2"></i> อัพโหลดสินค้า
+                    <div class="d-flex gap-3 align-items-center pt-2 border-top mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-4 shadow-sm" style="background: linear-gradient(135deg, #1a3a6e, #29579D); border: none; border-radius: 10px;">
+                            <i class="bi bi-save-fill me-2"></i> บันทึกการแก้ไข
                         </button>
-                        <a href="/" class="btn btn-outline-secondary btn-lg px-4" style="border-radius: 10px;">
+                        <a asp-action="EditProduct" class="btn btn-outline-secondary btn-lg px-4" style="border-radius: 10px;">
                             <i class="bi bi-x-circle me-1"></i> ยกเลิก
                         </a>
                     </div>
@@ -179,15 +163,6 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script>
-        function updateFileLabel(input, textId) {
-            const el = document.getElementById(textId);
-            if (input.files && input.files.length > 0) {
-                el.textContent = '📎 ' + input.files[0].name;
-                el.style.color = '#29579D';
-                el.style.fontWeight = '600';
-            }
-        }
-
         function previewCover(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();

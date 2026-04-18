@@ -20,12 +20,27 @@ public class HomeController : Controller
         return View(user);
     }
 
-    public IActionResult Index()
+    public IActionResult Index(int? categoryId)
     {
-        var products = _db.Products
-            .Where(p => p.Status == 1)
-            .OrderByDescending(p => p.CreatedDate)
+        IQueryable<ProductData> query = _db.Products.Where(p => p.Status == 1);
+        
+        if (categoryId.HasValue && categoryId.Value > 0)
+        {
+            query = query.Where(p => p.CategoryId == categoryId.Value);
+        }
+
+        var products = query.OrderByDescending(p => p.CreatedDate).ToList();
+        
+        // Fetch promoted books
+        var promotedBooks = _db.Products
+            .Where(p => p.Status == 1 && p.PromotionPrice != null && p.PromotionEndDate >= DateTime.Now)
+            .OrderByDescending(p => p.LastPromotionEdit)
+            .Take(4)
             .ToList();
+            
+        ViewBag.SelectedCategory = categoryId;
+        ViewBag.PromotedBooks = promotedBooks;
+        
         return View(products);
     }
 
@@ -102,6 +117,29 @@ public class HomeController : Controller
 
     public IActionResult Supporter()
     {
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult Supporter(string topic, string description)
+    {
+        if (!string.IsNullOrEmpty(topic) && !string.IsNullOrEmpty(description))
+        {
+            var userId = HttpContext.Session.GetString("UserId") ?? "Guest";
+            _db.SupportTickets.Add(new SupportTicket
+            {
+                UserId = userId,
+                Topic = topic,
+                Description = description,
+                Status = "Open",
+                CreatedDate = DateTime.Now
+            });
+            _db.SaveChanges();
+            TempData["SuccessMessage"] = "ส่งเรื่องแจ้งทีมงานเรียบร้อยแล้ว เราจะตรวจสอบโดยเร็วที่สุด!";
+            return RedirectToAction("Supporter");
+        }
+        
+        ModelState.AddModelError("", "กรุณากรอกข้อมูลให้ครบถ้วน");
         return View();
     }
 

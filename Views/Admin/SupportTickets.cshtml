@@ -1,0 +1,92 @@
+@using singleProject.ViewModels
+@model IEnumerable<SupportTicketViewModel>
+
+@{
+    ViewData["Title"] = "จัดการระบบดูแลลูกค้า (Support Tickets)";
+    Layout = "_SupporterLayout";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-1"><i class="bi bi-headset"></i> จัดการคำร้องเรียนและช่วยเหลือ (Tickets)</h2>
+            <p class="text-muted">ตรวจสอบ ตอบกลับ และจัดการปัญหาต่างๆ ที่ผู้ใช้แจ้งเข้ามา</p>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">Ticket ID</th>
+                    <th>User ID</th>
+                    <th>Email</th>
+                    <th>หัวข้อปัญหา</th>
+                    <th>วันที่แจ้ง</th>
+                    <th>สถานะ</th>
+                    <th class="text-end pe-4">จัดการ</th>
+                </tr>
+            </thead>
+            <tbody class="accordion" id="ticketsAccordion">
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-3 opacity-25"></i>
+                            ยังไม่มีคำร้องเรียนในขณะนี้
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model)
+                    {
+                        var ticket = item.Ticket;
+                        <tr class="accordion-item" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#collapse_@ticket.TicketId" aria-expanded="false" aria-controls="collapse_@ticket.TicketId">
+                            <td class="ps-4 fw-bold text-primary">
+                                #@ticket.TicketId <i class="bi bi-chevron-down ms-1 small text-muted"></i>
+                            </td>
+                            <td><span class="badge bg-secondary">@ticket.UserId</span></td>
+                            <td><a href="mailto:@item.UserEmail" class="text-decoration-none" onclick="event.stopPropagation();">@item.UserEmail</a></td>
+                            <td class="fw-semibold">@ticket.Topic</td>
+                            <td><small class="text-muted">@ticket.CreatedDate?.ToString("dd MMM yyyy HH:mm")</small></td>
+                            <td>
+                                @if (ticket.Status == "Open")
+                                {
+                                    <span class="badge bg-danger">รอดำเนินการ</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">แก้ไขแล้ว</span>
+                                }
+                            </td>
+                            <td class="text-end pe-4" onclick="event.stopPropagation();">
+                                <form asp-action="UpdateTicketStatus" method="post" class="d-inline-flex">
+                                    <input type="hidden" name="ticketId" value="@ticket.TicketId" />
+                                    @if(ticket.Status == "Open")
+                                    {
+                                        <input type="hidden" name="newStatus" value="Closed" />
+                                        <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-3"><i class="bi bi-check-circle"></i> ปิดเคส</button>
+                                    }
+                                    else
+                                    {
+                                        <input type="hidden" name="newStatus" value="Open" />
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3"><i class="bi bi-arrow-return-left"></i> เปิด</button>
+                                    }
+                                </form>
+                            </td>
+                        </tr>
+                        <tr class="collapse" id="collapse_@ticket.TicketId" data-bs-parent="#ticketsAccordion">
+                            <td colspan="7" class="bg-light p-4">
+                                <div class="bg-white p-3 rounded-3 border shadow-sm">
+                                    <h6 class="fw-bold text-primary"><i class="bi bi-chat-left-text me-2"></i>รายละเอียดเพิ่มเติม</h6>
+                                    <p class="mb-0 text-dark" style="white-space: pre-wrap;">@ticket.Description</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

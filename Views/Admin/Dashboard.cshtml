@@ -1,0 +1,120 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "_AdminLayout";
+}
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="fw-bold"><i class="bi bi-speedometer2 text-primary me-2"></i>Admin Dashboard</h1>
+            <p class="text-muted">Overview of platform performance and statistics.</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="small opacity-75">Total Users</div>
+                        <div class="display-6 fw-bold">@ViewBag.TotalUsers</div>
+                    </div>
+                    <i class="bi bi-people fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-success text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="small opacity-75">Total Books</div>
+                        <div class="display-6 fw-bold">@ViewBag.TotalProducts</div>
+                    </div>
+                    <i class="bi bi-book fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-warning text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="small opacity-75">Total Sales</div>
+                        <div class="display-6 fw-bold">@ViewBag.TotalSales</div>
+                    </div>
+                    <i class="bi bi-cart-check fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 bg-info text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="small opacity-75">Revenue</div>
+                        <div class="display-6 fw-bold">฿@ViewBag.TotalRevenue.ToString("N0")</div>
+                    </div>
+                    <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Sales Table -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h3 class="fw-bold fs-5 mb-4"><i class="bi bi-clock-history me-2"></i>Recent Sales</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Date</th>
+                                <th class="text-end">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.RecentSales != null)
+                            {
+                                foreach (var sale in ViewBag.RecentSales)
+                                {
+                                    <tr>
+                                        <td><span class="fw-semibold">@sale.ProductName</span></td>
+                                        <td class="text-muted">@sale.PurchaseDate.ToString("dd MMM yyyy, HH:mm")</td>
+                                        <td class="text-end fw-bold text-success">฿@sale.Price.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">No recent sales data.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h3 class="fw-bold fs-5 mb-4"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</h3>
+                <div class="d-grid gap-3">
+                    <a asp-controller="Account" asp-action="UserLists" class="btn btn-outline-primary text-start p-3 rounded-3">
+                        <i class="bi bi-people-fill me-2"></i>Manage Users
+                    </a>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary text-start p-3 rounded-3">
+                        <i class="bi bi-eye me-2"></i>View Website
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card { transition: transform 0.2s ease; }
+    .card:hover { transform: translateY(-5px); }
+</style>

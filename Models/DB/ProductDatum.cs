@@ -25,4 +25,10 @@ public partial class ProductData
     public DateTime? CreatedDate { get; set; }
 
     public DateTime? UpdatedDate { get; set; }
+
+    public decimal? PromotionPrice { get; set; }
+
+    public DateTime? PromotionEndDate { get; set; }
+
+    public DateTime? LastPromotionEdit { get; set; }
 }

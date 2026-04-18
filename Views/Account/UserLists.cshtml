@@ -1,66 +1,69 @@
 @{
-  ViewData["Title"] = "User Lists";
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "User Management";
 }
-@using singleProject.Models
-@model IEnumerable<singleProject.Models.User>
-<section>
-  @* <p>@Model.Username</p> *@
-  <h1>User Management</h1>
-  <p>Manage user accounts and permissions.</p>
-  
-  <button id="AddUserBtn" class="btn btn-success mb-3">Add User</button>
+@using singleProject.Models.Db
+@using Microsoft.AspNetCore.Http
+@model IEnumerable<UserDatum>
 
-  @* <script>
-    // add moke up user data
-    const users = [
-      { id: 1, name: 'John Doe', email: '123@gmail.com', role: 'Admin' },
-      { id: 2, name: 'Jane Smith', email: '456@gmail.com', role: 'User' },
-      { id: 3, name: 'Mike Johnson', email: '789@gmail.com', role: 'User' }
-    ];
+<section class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold"><i class="bi bi-people-fill text-primary me-2"></i>User Management</h1>
+            <p class="text-muted">Manage user accounts and website permissions.</p>
+        </div>
+        <button id="AddUserBtn" class="btn btn-primary"><i class="bi bi-person-plus-fill me-2"></i>Add New User</button>
+    </div>
 
-    function populateUserTable() {
-      const tbody = document.querySelector('tbody');
-      users.forEach(user => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${user.id}</td>
-          <td>${user.name}</td>
-          <td>${user.email}</td>
-          <td>${user.role}</td>
-          <td>
-            <button class="btn btn-sm btn-primary">Edit</button>
-            <button class="btn btn-sm btn-danger">Delete</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     }
 
-    document.addEventListener('DOMContentLoaded', populateUserTable);
-  </script> *@
-
-
-
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>User ID</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      @* @foreach(var item in Model)
-      {
-        <tr>
-          <td>@item.Username</td>
-          <td>@item.Password</td>
-        </tr>
-      } *@
-    </tbody>
-  </table>
+    <div class="card shadow-sm border-0 rounded-3 overflow-hidden">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="bg-light">
+                <tr>
+                    <th class="ps-4">User ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-4"><code class="text-primary fw-bold">@item.UserId</code></td>
+                        <td>@item.UserName</td>
+                        <td>@item.Email</td>
+                        <td>
+                            <form asp-action="UpdateRole" method="post" class="d-flex align-items-center gap-2">
+                                <input type="hidden" name="userId" value="@item.UserId" />
+                                <select name="newRole" class="form-select form-select-sm" style="width: auto;">
+                                    <option value="User" selected="@(item.UserRole == "User")">User</option>
+                                    <option value="Seller" selected="@(item.UserRole == "Seller")">Seller</option>
+                                    <option value="Supporter" selected="@(item.UserRole == "Supporter")">Supporter</option>
+                                    <option value="Admin" selected="@(item.UserRole == "Admin")">Admin</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Update</button>
+                            </form>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-light border" title="Edit Profile"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-sm btn-light border text-danger" title="Delete User"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </section>
 
 <style>

@@ -21,6 +21,8 @@ public partial class EbookBestContext : DbContext
 
     public virtual DbSet<UserLibrary> UserLibraries { get; set; }
 
+    public virtual DbSet<SupportTicket> SupportTickets { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=EBookBest;Trusted_Connection=True;TrustServerCertificate=True");
@@ -61,6 +63,18 @@ public partial class EbookBestContext : DbContext
             entity.Property(e => e.UserId).HasMaxLength(10).IsRequired();
             entity.Property(e => e.ProductId).IsRequired();
             entity.Property(e => e.PurchaseDate).HasDefaultValueSql("GETDATE()");
+        });
+
+        modelBuilder.Entity<SupportTicket>(entity =>
+        {
+            entity.HasKey(e => e.TicketId);
+            entity.ToTable("SupportTickets");
+            entity.Property(e => e.TicketId).ValueGeneratedOnAdd();
+            entity.Property(e => e.UserId).HasMaxLength(10);
+            entity.Property(e => e.Topic).HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(2000);
+            entity.Property(e => e.Status).HasMaxLength(20).HasDefaultValue("Open");
+            entity.Property(e => e.CreatedDate).HasDefaultValueSql("GETDATE()");
         });
 
         OnModelCreatingPartial(modelBuilder);

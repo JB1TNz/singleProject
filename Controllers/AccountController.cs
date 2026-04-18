@@ -87,14 +87,44 @@ public class AccountController : Controller
       return RedirectToAction("Login");
   }
 
-  public IActionResult UserLists(string user, string passw)
+  public IActionResult UserLists()
   {
-    ViewBag.Username = user;
-    ViewBag.Password = passw;
-    return View();
+      var role = HttpContext.Session.GetString("Role");
+      if (role != "Admin")
+      {
+          return RedirectToAction("Index", "Home");
+      }
+
+      using (var db = new EbookBestContext())
+      {
+          var users = db.UserData.ToList();
+          return View(users);
+      }
+  }
+
+  [HttpPost]
+  public IActionResult UpdateRole(string userId, string newRole)
+  {
+      using (var db = new EbookBestContext())
+      {
+          var user = db.UserData.FirstOrDefault(u => u.UserId == userId);
+          if (user != null)
+          {
+              user.UserRole = newRole;
+              db.SaveChanges();
+              TempData["SuccessMessage"] = $"อัพเดทสิทธิ์ของ {user.UserName} เรียบร้อยแล้ว";
+          }
+      }
+      return RedirectToAction("UserLists");
   }
 
 
+
+  public IActionResult Logout()
+  {
+      HttpContext.Session.Clear();
+      return RedirectToAction("Login");
+  }
 
   [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
   public IActionResult Error()

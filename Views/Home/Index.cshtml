@@ -14,6 +14,10 @@
     {
         Layout = "_SellerLayout";
     }
+    else if (role == "Supporter")
+    {
+        Layout = "_SupporterLayout";
+    }
     else if (role == "User")
     {
         Layout = "_UserLayout";
@@ -25,12 +29,12 @@
 
     var categoryNames = new Dictionary<int, string>
     {
-        { 1, "📖 นิยาย / เรื่องสั้น" },
-        { 2, "🎓 วิชาการ / การศึกษา" },
-        { 3, "💼 ธุรกิจ / การเงิน" },
-        { 4, "🌿 สุขภาพ / ไลฟ์สไตล์" },
-        { 5, "💻 เทคโนโลยี / IT" },
-        { 6, "📦 อื่นๆ" }
+        { 1, "นิยาย / เรื่องสั้น" },
+        { 2, "วิชาการ / การศึกษา" },
+        { 3, "ธุรกิจ / การเงิน" },
+        { 4, "สุขภาพ / ไลฟ์สไตล์" },
+        { 5, "เทคโนโลยี / IT" },
+        { 6, "อื่นๆ" }
     };
 }
 
@@ -54,7 +58,7 @@
                     <span>Guest</span>
                 }
             </p>
-            <h1 class="hero-title">Discover Your Next<br />Favorite E-Book ✨</h1>
+            <h1 class="hero-title">Discover Your Next<br />Favorite E-Book</h1>
             <p class="hero-sub">Thousands of titles. Instant download. Read anytime, anywhere.</p>
             <a href="#featured-section" class="btn-hero">
                 <i class="bi bi-search me-2"></i>Browse Collection
@@ -62,12 +66,57 @@
         </div>
         <div class="hero-illustration">
             <div class="hero-book-stack">
-                <div class="hero-book b1">📘</div>
-                <div class="hero-book b2">📗</div>
-                <div class="hero-book b3">📕</div>
+                <div class="hero-book b1"><img src="@Url.Content("~/Content/image/Book2.png")" alt="Book" class="hero-img"></div>
+                <div class="hero-book b2"><img src="@Url.Content("~/Content/image/Book.png")" alt="Book" class="hero-img"></div>
+                <div class="hero-book b3"><img src="@Url.Content("~/Content/image/Book3.png")" alt="Book" class="hero-img"></div>
             </div>
         </div>
     </section>
+    <!-- Promotions Section -->
+    @if (ViewBag.PromotedBooks != null && ((List<ProductData>)ViewBag.PromotedBooks).Any())
+    {
+        <section class="featured-section bg-danger bg-opacity-10 py-5 rounded-4 mb-5" style="border: 2px dashed #dc3545;">
+            <div class="section-header px-4">
+                <h2 class="section-title text-danger fw-bold"><i class="bi bi-fire me-2"></i>🔥 โปรโมชั่นพิเศษ วันนี้เท่านั้น!</h2>
+                <p class="section-sub text-danger opacity-75">ลดราคาแรงสุดในรอบวัน ห้ามพลาดเด็ดขาด</p>
+            </div>
+            <div class="book-grid px-4">
+                @foreach (var book in (List<ProductData>)ViewBag.PromotedBooks)
+                {
+                    <a href="@Url.Action("BookPreview", "Home", new { id = book.ProductId })" class="book-card-link">
+                        <div class="book-card border-danger shadow-sm">
+                            <div class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 rounded-bl-3 rounded-tr-3 fw-bold z-1 shadow" style="border-bottom-left-radius: 12px; border-top-right-radius: 16px;">
+                                ลดพิเศษ
+                            </div>
+                            <!-- Cover Image -->
+                            <div class="book-cover">
+                                @if (!string.IsNullOrEmpty(book.CoverPicture))
+                                {
+                                    <img src="@book.CoverPicture" alt="@book.ProductName" class="book-cover-img" />
+                                }
+                                else
+                                {
+                                    <div class="book-no-cover"><span class="no-cover-icon">:(</span></div>
+                                }
+                            </div>
+                            <!-- Book Info -->
+                            <div class="book-info">
+                                <h3 class="book-title text-danger">@book.ProductName</h3>
+                                <p class="book-desc">@(book.ProductDescription?.Length > 60 ? book.ProductDescription[..60] + "..." : book.ProductDescription ?? "-")</p>
+                                <div class="book-footer">
+                                    <div>
+                                        <div class="small text-muted text-decoration-line-through">฿@book.Price?.ToString("N2")</div>
+                                        <div class="book-price text-danger fs-5 fw-bold">฿@book.PromotionPrice?.ToString("N2")</div>
+                                    </div>
+                                    <span class="btn-view-detail text-danger">ไปช้อปเลย <i class="bi bi-cart"></i></span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </section>
+    }
 
     <!-- Featured Books from DB -->
     <section class="featured-section" id="featured-section">
@@ -100,7 +149,7 @@
                                 else
                                 {
                                     <div class="book-no-cover">
-                                        <span class="no-cover-icon">📖</span>
+                                        <span class="no-cover-icon">:(</span>
                                         <span class="no-cover-text">ไม่พบปกหนังสือ</span>
                                     </div>
                                 }
@@ -110,12 +159,22 @@
                                 <div class="book-category">
                                     @(book.CategoryId.HasValue && categoryNames.ContainsKey(book.CategoryId.Value)
                                         ? categoryNames[book.CategoryId.Value]
-                                        : "📦 อื่นๆ")
+                                        : "อื่นๆ")
                                 </div>
                                 <h3 class="book-title">@book.ProductName</h3>
                                 <p class="book-desc">@(book.ProductDescription?.Length > 80 ? book.ProductDescription[..80] + "..." : book.ProductDescription ?? "-")</p>
                                 <div class="book-footer">
-                                    <span class="book-price">฿@book.Price?.ToString("N2")</span>
+                                    @if (book.PromotionPrice != null && book.PromotionEndDate >= DateTime.Now)
+                                    {
+                                        <div>
+                                            <span class="small text-muted text-decoration-line-through me-1">฿@book.Price?.ToString("N2")</span>
+                                            <span class="book-price text-danger">฿@book.PromotionPrice?.ToString("N2")</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="book-price">฿@book.Price?.ToString("N2")</span>
+                                    }
                                     <span class="btn-view-detail">ดูรายละเอียด <i class="bi bi-arrow-right-short"></i></span>
                                 </div>
                             </div>
@@ -130,11 +189,17 @@
     <section class="categories-section">
         <h2 class="section-title"><i class="bi bi-grid-fill me-2 text-primary"></i>หมวดหมู่ยอดนิยม</h2>
         <div class="category-list">
-            <div class="category-chip">📖 นิยาย</div>
-            <div class="category-chip">💻 เทคโนโลยี</div>
-            <div class="category-chip">💼 ธุรกิจ</div>
-            <div class="category-chip">🎓 การศึกษา</div>
-            <div class="category-chip">🌿 ไลฟ์สไตล์</div>
+            <a href="@Url.Action("Index", "Home", new { categoryId = 0 })" 
+               class="category-chip @(ViewBag.SelectedCategory == null || ViewBag.SelectedCategory == 0 ? "active" : "")">
+               ทั้งหมด
+            </a>
+            @foreach (var cat in categoryNames)
+            {
+                <a href="@Url.Action("Index", "Home", new { categoryId = cat.Key })" 
+                   class="category-chip @(ViewBag.SelectedCategory == cat.Key ? "active" : "")">
+                   @cat.Value
+                </a>
+            }
         </div>
     </section>
 
@@ -245,9 +310,20 @@
         animation: float 3s ease-in-out infinite;
     }
 
-    .hero-book.b1 { animation-delay: 0s; transform: rotate(-10deg); }
-    .hero-book.b2 { animation-delay: 0.4s; font-size: 6rem; }
-    .hero-book.b3 { animation-delay: 0.8s; transform: rotate(10deg); }
+    .hero-book.b1 { --rot: -10deg; animation-delay: 0s; transform: rotate(var(--rot)); }
+    .hero-book.b2 { --rot: 0deg; animation-delay: 0.4s; font-size: 6rem; display: flex; align-items: center; justify-content: center; z-index: 2; transform: rotate(var(--rot)); }
+    .hero-book.b3 { --rot: 10deg; animation-delay: 0.8s; transform: rotate(var(--rot)); }
+
+    .hero-img { 
+        width: auto;
+        height: auto;
+        max-width: 150px; 
+        max-height: 210px; 
+        object-fit: contain; 
+        @* border-radius: 4px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        border: 1px solid rgba(255,255,255,0.1); *@
+    }
 
     @@keyframes float {
         0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
@@ -430,6 +506,15 @@
         transition: all 0.2s;
         color: #374151;
         box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .category-chip.active {
+        background: #29579D;
+        color: #fff;
+        border-color: #29579D;
+        box-shadow: 0 4px 14px rgba(41,87,157,0.25);
     }
 
     .category-chip:hover {

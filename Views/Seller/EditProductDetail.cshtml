@@ -81,6 +81,41 @@
                         </div>
                     </div>
 
+                    <!-- ราคาโปรโมชั่น -->
+                    <div class="row g-3 mb-4 p-3 bg-danger bg-opacity-10" style="border-radius: 12px; border: 1px dashed #dc3545;">
+                        <div class="col-12 mb-1">
+                            <h5 class="text-danger mb-0"><i class="bi bi-fire"></i> ตั้งค่าโปรโมชั่น <small class="text-muted fs-6">(แก้ไขได้ 1 ครั้งต่อวัน)</small></h5>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="PromotionPrice" class="form-label fw-semibold text-danger">ราคาโปรโมชั่น (บาท)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-danger text-white"><i class="bi bi-tag-fill"></i></span>
+                                <input asp-for="PromotionPrice" type="number" step="0.01" min="0" class="form-control border-danger" placeholder="เว้นว่างไว้หากไม่จัดโปร" />
+                            </div>
+                            <span asp-validation-for="PromotionPrice" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="PromotionEndDate" class="form-label fw-semibold text-danger">สิ้นสุดโปรโมชั่น</label>
+                            <input asp-for="PromotionEndDate" type="datetime-local" class="form-control border-danger" />
+                        </div>
+                        @if (Model.LastPromotionEdit.HasValue)
+                        {
+                            <div class="col-12 mt-2">
+                                <small class="text-muted"><i class="bi bi-clock-history"></i> แก้ไขโปรโมชั่นล่าสุดเมื่อ: @Model.LastPromotionEdit.Value.ToString("dd MMM yyyy HH:mm")</small>
+                            </div>
+                        }
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState[""]?.Errors.Count > 0)
+                        {
+                            <div class="col-12 mt-2">
+                                <div class="alert alert-danger py-2 mb-0 border-0 d-flex align-items-center">
+                                    <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                                    @ViewData.ModelState[""].Errors.First().ErrorMessage
+                                </div>
+                            </div>
+                        }
+                    </div>
+
                     <!-- สถานะ -->
                     <div class="mb-3">
                         <label asp-for="Status" class="form-label fw-semibold">

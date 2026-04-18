@@ -31,5 +31,14 @@ namespace singleProject.ViewModels
 
         [Display(Name = "สถานะ")]
         public int Status { get; set; } = 1;
+
+        [Display(Name = "ราคาโปรโมชั่น (ลดราคา)")]
+        [Range(0.01, 999999.99, ErrorMessage = "ราคาโปรโมชั่นต้องมากกว่า 0")]
+        public decimal? PromotionPrice { get; set; }
+
+        [Display(Name = "โปรโมชั่นสิ้นสุดวันที่")]
+        public DateTime? PromotionEndDate { get; set; }
+
+        public DateTime? LastPromotionEdit { get; set; }
     }
 }

@@ -66,7 +66,10 @@ public class SellerController : Controller
             Price = product.Price ?? 0,
             CategoryId = product.CategoryId ?? 0,
             Status = product.Status ?? 1,
-            ExistingCoverPicture = product.CoverPicture
+            ExistingCoverPicture = product.CoverPicture,
+            PromotionPrice = product.PromotionPrice,
+            PromotionEndDate = product.PromotionEndDate,
+            LastPromotionEdit = product.LastPromotionEdit
         };
 
         return View(model);
@@ -84,6 +87,20 @@ public class SellerController : Controller
 
         var product = _db.Products.FirstOrDefault(p => p.ProductId == model.ProductId && p.SellerId == sellerId);
         if (product == null) return NotFound();
+
+        // Promotion limit: Can only edit promotion once every 24 hours
+        if (model.PromotionPrice != product.PromotionPrice || model.PromotionEndDate != product.PromotionEndDate)
+        {
+            if (product.LastPromotionEdit.HasValue && (DateTime.Now - product.LastPromotionEdit.Value).TotalHours < 24)
+            {
+                ModelState.AddModelError("", "ไม่สามารถแก้ไขโปรโมชั่นได้บ่อยกว่า 1 ครั้งใน 24 ชั่วโมง หรือ 1 วัน");
+                return View(model);
+            }
+            
+            product.PromotionPrice = model.PromotionPrice;
+            product.PromotionEndDate = model.PromotionEndDate;
+            product.LastPromotionEdit = DateTime.Now;
+        }
 
         // Update properties
         product.ProductName = model.ProductName;

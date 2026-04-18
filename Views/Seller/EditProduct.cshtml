@@ -85,8 +85,18 @@
                                     <td>
                                         <span class="badge bg-light text-dark border px-2 py-1">@catName</span>
                                     </td>
-                                    <td class="fw-semibold text-success">
-                                        ฿@book.Price?.ToString("N2")
+                                    <td>
+                                        @if (book.PromotionPrice != null && book.PromotionEndDate >= DateTime.Now)
+                                        {
+                                            <div class="fw-semibold text-danger">
+                                                ฿@book.PromotionPrice?.ToString("N2") <span class="badge bg-danger ms-1">Sale</span>
+                                            </div>
+                                            <div class="small text-muted text-decoration-line-through">฿@book.Price?.ToString("N2")</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="fw-semibold text-success">฿@book.Price?.ToString("N2")</div>
+                                        }
                                     </td>
                                     <td>
                                         @if (book.Status == 1)

@@ -27,21 +27,52 @@ namespace singleProject.Controllers
             ViewBag.TotalSales = _db.UserLibraries.Count();
             
             // Calculate Total Revenue
-            var revenue = (from lib in _db.UserLibraries
-                          join p in _db.Products on lib.ProductId equals p.ProductId
-                          select p.Price).Sum() ?? 0;
+            var revenueQuery = (from lib in _db.UserLibraries
+                                join p in _db.Products on lib.ProductId equals p.ProductId
+                                select new {
+                                    p.Price,
+                                    p.PromotionPrice,
+                                    p.PromotionEndDate,
+                                    p.LastPromotionEdit,
+                                    lib.PurchaseDate
+                                }).ToList();
+
+            decimal revenue = 0;
+            foreach (var item in revenueQuery)
+            {
+                if (item.PromotionPrice != null && item.LastPromotionEdit != null && item.PromotionEndDate != null &&
+                    item.PurchaseDate >= item.LastPromotionEdit && item.PurchaseDate <= item.PromotionEndDate)
+                {
+                    revenue += item.PromotionPrice.Value;
+                }
+                else
+                {
+                    revenue += item.Price ?? 0;
+                }
+            }
             
             ViewBag.TotalRevenue = revenue;
 
             // Optional: Recent Sales
-            var recentSales = (from lib in _db.UserLibraries
-                               join p in _db.Products on lib.ProductId equals p.ProductId
-                               orderby lib.PurchaseDate descending
-                               select new {
-                                   ProductName = p.ProductName,
-                                   PurchaseDate = lib.PurchaseDate,
-                                   Price = p.Price
-                               }).Take(5).ToList();
+            var recentSalesData = (from lib in _db.UserLibraries
+                                   join p in _db.Products on lib.ProductId equals p.ProductId
+                                   orderby lib.PurchaseDate descending
+                                   select new {
+                                       ProductName = p.ProductName,
+                                       PurchaseDate = lib.PurchaseDate,
+                                       Price = p.Price,
+                                       PromotionPrice = p.PromotionPrice,
+                                       PromotionEndDate = p.PromotionEndDate,
+                                       LastPromotionEdit = p.LastPromotionEdit
+                                   }).Take(5).ToList();
+
+            var recentSales = recentSalesData.Select(x => new {
+                ProductName = x.ProductName,
+                PurchaseDate = x.PurchaseDate,
+                Price = (x.PromotionPrice != null && x.LastPromotionEdit != null && x.PromotionEndDate != null &&
+                         x.PurchaseDate >= x.LastPromotionEdit && x.PurchaseDate <= x.PromotionEndDate) 
+                         ? x.PromotionPrice.Value : (x.Price ?? 0)
+            }).ToList();
                                
             ViewBag.RecentSales = recentSales;
 

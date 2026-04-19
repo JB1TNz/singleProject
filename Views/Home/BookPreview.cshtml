@@ -67,7 +67,15 @@
 
             <!-- Purchase Card -->
             <div class="purchase-card">
-                <div class="purchase-price">฿@Model.Price?.ToString("N2")</div>
+                @if (Model.PromotionPrice != null && Model.PromotionEndDate >= DateTime.Now)
+                {
+                    <div class="text-muted text-decoration-line-through mb-1" style="font-size: 0.9rem;">฿@Model.Price?.ToString("N2")</div>
+                    <div class="purchase-price text-danger mb-2">฿@Model.PromotionPrice?.ToString("N2")</div>
+                }
+                else
+                {
+                    <div class="purchase-price mb-2">฿@Model.Price?.ToString("N2")</div>
+                }
                 <p class="purchase-note"><i class="bi bi-lightning-fill text-warning me-1"></i>ดาวน์โหลดได้ทันทีหลังชำระเงิน</p>
 
                 @if (Context.Session.GetString("Role") == "Seller")

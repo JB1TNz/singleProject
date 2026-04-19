@@ -77,7 +77,7 @@
     {
         <section class="featured-section bg-danger bg-opacity-10 py-5 rounded-4 mb-5" style="border: 2px dashed #dc3545;">
             <div class="section-header px-4">
-                <h2 class="section-title text-danger fw-bold"><i class="bi bi-fire me-2"></i>🔥 โปรโมชั่นพิเศษ วันนี้เท่านั้น!</h2>
+                <h2 class="section-title text-danger fw-bold"><i class="bi bi-fire me-2"></i> โปรโมชั่นพิเศษ วันนี้เท่านั้น!</h2>
                 <p class="section-sub text-danger opacity-75">ลดราคาแรงสุดในรอบวัน ห้ามพลาดเด็ดขาด</p>
             </div>
             <div class="book-grid px-4">
@@ -85,7 +85,7 @@
                 {
                     <a href="@Url.Action("BookPreview", "Home", new { id = book.ProductId })" class="book-card-link">
                         <div class="book-card border-danger shadow-sm">
-                            <div class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 rounded-bl-3 rounded-tr-3 fw-bold z-1 shadow" style="border-bottom-left-radius: 12px; border-top-right-radius: 16px;">
+                            <div class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 rounded-bl-3 rounded-tr-3 fw-bold z-1 shadow promo-badge" style="border-bottom-left-radius: 12px; border-top-right-radius: 16px;">
                                 ลดพิเศษ
                             </div>
                             <!-- Cover Image -->
@@ -566,6 +566,20 @@
         transform: translateY(-2px) scale(1.03);
         color: #1a3a6e;
         box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+    }
+
+    .promo-badge {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+    }
+    .book-card:hover .promo-badge {
+        opacity: 1;
+        visibility: visible;
+    }
+    .promo-badge:hover {
+        transform: scale(1.1);
+        background-color: #bb2d3b !important;
     }
 
     @@media (max-width: 768px) {
